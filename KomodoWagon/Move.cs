@@ -1,36 +1,45 @@
 namespace KomodoWagon;
 
 public class Move {
-    public int startSquare, endSquare;
-    public Move(int startSquare, int endSquare) {
-        this.startSquare = startSquare;
-        this.endSquare = endSquare;
+    // StartSquare, EndSquare: the simplest yet powerful representation of a move only by square indices.
+    public int StartSquare, EndSquare;
+
+    // Move(int StartSquare, int EndSquare): initializes member variables.
+    // Move(string move): generates a move base on a sigle string in ?long algebraic? notation (e.g. e2e3).
+    public Move(int StartSquare, int EndSquare) {
+        this.StartSquare = StartSquare;
+        this.EndSquare = EndSquare;
     }
     public Move(string move) {
         string alph = "abcdefgh";
         int rank, file;
         rank = 8 - int.Parse(move.ElementAt(1).ToString());
         file = alph.IndexOf(move.ElementAt(0));
-        startSquare = rank * 8 + file;
+        StartSquare = rank * 8 + file;
         rank = 8 - int.Parse(move.ElementAt(3).ToString());
         file = alph.IndexOf(move.ElementAt(2));
-        endSquare = rank * 8 + file;
+        EndSquare = rank * 8 + file;
     }
+
+    // Generates a string in ?long algebraic? notation (e.g. e2e3) based on current values of member variables.
     public override string ToString() {
         string move = "";
         string alph = "abcdefgh";
         int rank, file;
-        file = startSquare % 8;
-        rank = 8 - (startSquare - file) / 8;
+        file = StartSquare % 8;
+        rank = 8 - (StartSquare - file) / 8;
         move += "" + alph.ElementAt(file);
         move += "" + rank;
-        file = endSquare % 8;
-        rank = 8 - (endSquare - file) / 8;
+        file = EndSquare % 8;
+        rank = 8 - (EndSquare - file) / 8;
         move += "" + alph.ElementAt(file);
         move += "" + rank;
         return move;
     }
-    public static Move fromEnPassantTargetSquare(string targetSquare) {
+
+    // Generates a move from a string representing the enPassant target square in the current position.
+    // Useful for calculating the last move made based on a FEN string.
+    public static Move FromEnPassantTargetSquare(string targetSquare) {
         string file = targetSquare.ElementAt(0).ToString();
         Move move;
         if (targetSquare.ElementAt(1) == '3') {

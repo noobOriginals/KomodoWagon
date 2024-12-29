@@ -1,6 +1,7 @@
 namespace KomodoWagon;
 
 public class Piece {
+    // Constants for representing a piece/square with a single Byte.
     public const byte White = 0b1000;
     public const byte Black = 0b10000;
     public const byte None = 0b0;
@@ -11,23 +12,30 @@ public class Piece {
     public const byte Queen = 0b101;
     public const byte King = 0b110;
 
-    public static byte getPieceType(byte piece) {
-        piece = (byte) (piece | (3 << 3));
-        return (byte) (piece ^ (3 << 3));;
-    }
-    public static byte getPieceColor(byte piece) {
+    // GetPieceColor(byte piece): returns the color of the piece equivalent to the color constant of the piece.
+    // GetPieceType(byte piece): returns the type of the piece equivalent to the type constant of the piece.
+    // IsColor(byte piece, byte color): returns true or false depending of the piece matching the color given;
+    // IsType(byte piece, byte type): returns true or false depending of the piece matching the type given;
+    public static byte GetPieceColor(byte piece) {
         piece = (byte) (piece >> 3);
         return (byte) (piece << 3);;
     }
-    public static bool isColor(byte piece, byte color) {
-        return (piece >> 3) == (color >> 3);
+    public static byte GetPieceType(byte piece) {
+        piece = (byte) (piece | (3 << 3));
+        return (byte) (piece ^ (3 << 3));;
     }
-    public static bool isType(byte piece, byte type) {
-        return getPieceType(piece) == type;
+    public static bool IsColor(byte piece, byte color) {
+        return GetPieceColor(piece) == color; 
     }
-    public static char toChar(byte piece) {
-        bool uppercase = isColor(piece, White);
-        piece = getPieceType(piece);
+    public static bool IsType(byte piece, byte type) {
+        return GetPieceType(piece) == type;
+    }
+
+    // ToChar(byte piece): based on a sigle character, returns a piece with a certain type. Useful for reading FEN's
+    // ToPiece(char value): based on a piece, returns a single character representing that piece. Useful for creating FEN's
+    public static char ToChar(byte piece) {
+        bool uppercase = IsColor(piece, White);
+        piece = GetPieceType(piece);
         switch (piece) {
             case None:
                 return ' ';
@@ -47,7 +55,7 @@ public class Piece {
                 return ' ';
         }
     }
-    public static byte toPiece(char value) {
+    public static byte ToPiece(char value) {
         bool uppercase = Char.IsUpper(value);
         switch (Char.ToUpper(value)) {
             case ' ':
