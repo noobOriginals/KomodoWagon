@@ -1,4 +1,4 @@
-namespace KomodoWagon;
+namespace ChessBot;
 
 public class Piece {
     // Constants for representing a piece/square with a single Byte.

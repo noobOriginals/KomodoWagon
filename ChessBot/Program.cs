@@ -1,4 +1,4 @@
-﻿namespace KomodoWagon;
+﻿namespace ChessBot;
 
 class Program {
     static void Main(string[] args) {

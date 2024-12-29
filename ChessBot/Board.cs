@@ -1,6 +1,4 @@
-using System.Resources;
-
-namespace KomodoWagon;
+namespace ChessBot;
 
 public class Board {
     // Square array: the uni-dimasional representation of the chess board.

@@ -1,4 +1,4 @@
-namespace KomodoWagon;
+namespace ChessBot;
 
 public class Move {
     // StartSquare, EndSquare: the simplest yet powerful representation of a move only by square indices.
