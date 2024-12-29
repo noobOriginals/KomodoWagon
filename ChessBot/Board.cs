@@ -80,6 +80,22 @@ public class Board {
         Reset("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
+    public static byte[,] To2DArray() {
+        byte[,] square = new byte[8, 8];
+        for (int i = 0; i < 64; i++) {
+            int file, rank;
+            file = i % 8;
+            rank = (i - file) / 8;
+            square[rank, file] = Square[i];
+        }
+        return square;
+    }
+    public static Move[] GenerateLegalMoves() {
+        int maxMoves = 120;
+        Move[] moves = new Move[maxMoves];
+        return moves;
+    }
+
     // Print(): writes a visual representation of the board to the console.
     // PrintInfo(): also writes additional information that is stored in the Board class.
     public static void Print() {
