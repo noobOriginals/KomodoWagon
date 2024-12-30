@@ -105,119 +105,66 @@ public class Board {
         return square;
     }
     public static Move[] GenerateLegalMoves() {
-        foreach (int piece in WhitePieces) {
-            int file = piece % 8;
-            int rank = (piece - file) / 8;
-            int[] closest = Enumerable.Repeat(-1, 8).ToArray();
-            int[] lastClosest = Enumerable.Repeat(8, 8).ToArray();
-            foreach (int blackPiece in BlackPieces) {
-                int pieceFile = blackPiece % 8;
-                int pieceRank = (blackPiece - pieceFile) / 8;
-                // if (pieceFile - file == 0) {
-                //     // closest[0] = pieceRank - rank < closest[0] ? pieceRank - rank : closest[0];
-                //     // closest[2] = rank - pieceRank < closest[2] ? rank - pieceRank : closest[2];
-                //     closest[0] = pieceRank - rank < closest[0] ? blackPiece : closest[0];
-                //     closest[2] = rank - pieceRank < closest[2] ? blackPiece : closest[2];
-                // }
-                // if (pieceRank - rank == 0) {
-                //     // closest[1] = pieceFile - file < closest[1] ? pieceFile - file : closest[1];
-                //     // closest[3] = file - pieceFile < closest[3] ? file - pieceFile : closest[3];
-                //     closest[1] = pieceFile - file < closest[1] ? blackPiece : closest[1];
-                //     closest[3] = file - pieceFile < closest[3] ? blackPiece : closest[3];
-                // }
-                // if (pieceFile - file - pieceRank + rank == 0) {
-                //     // closest[5] = pieceFile - file < closest[5] ? pieceFile - file : closest[5];
-                //     // closest[7] = file - pieceFile < closest[7] ? pieceFile - file : closest[7];
-                //     closest[5] = pieceFile - file < closest[5] ? blackPiece : closest[5];
-                //     closest[7] = file - pieceFile < closest[7] ? blackPiece : closest[7];
-                // }
-                // if (pieceFile - file + pieceRank - rank == 0) {
-                //     // closest[4] = file - pieceFile < closest[4] ? file - pieceFile : closest[4];
-                //     // closest[6] = pieceFile - file < closest[6] ? pieceFile - file : closest[6];
-                //     closest[4] = file - pieceFile < closest[4] ? blackPiece : closest[4];
-                //     closest[6] = pieceFile - file < closest[6] ? blackPiece : closest[6];
-                // }
-                // if (pieceFile - file == 0) {
-                //     if (pieceRank - rank > 0 && pieceRank - rank < lastClosest[0]) {
-                //         closest[0] = blackPiece;
-                //         lastClosest[0] = pieceRank - rank;
-                //     } else if (rank - pieceRank < lastClosest[2]) {
-                //         closest[2] = blackPiece;
-                //         lastClosest[2] = rank - pieceRank;
-                //     }
-                // }
-                // if (pieceRank - rank == 0) {
-                //     if (pieceFile - file > 0 && pieceFile - file < lastClosest[1]) {
-                //         closest[1] = blackPiece;
-                //         lastClosest[1] = pieceFile - file;
-                //     } else if (file - pieceFile < lastClosest[3]) {
-                //         closest[3] = blackPiece;
-                //         lastClosest[3] = file - pieceFile;
-                //     }
-                // }
-                // if (pieceFile - file - pieceRank + rank == 0) {
-                //     if (pieceFile - file > 0 && pieceFile - file < lastClosest[4]) {
-                //         closest[4] = blackPiece;
-                //         lastClosest[4] = pieceFile - file;
-                //     } else if (file - pieceFile < lastClosest[6]) {
-                //         closest[6] = blackPiece;
-                //         lastClosest[6] = file - pieceFile;
-                //     }
-                // }
-                // if (pieceFile - file + pieceRank - rank == 0) {
-                //     if (pieceFile - file > 0 && pieceFile - file < lastClosest[5]) {
-                //         closest[5] = blackPiece;
-                //         lastClosest[5] = pieceFile - file;
-                //     } else if (file - pieceFile < lastClosest[7]) {
-                //         closest[7] = blackPiece;
-                //         lastClosest[7] = file - pieceFile;
-                //     }
-                // }
-                if (pieceFile - file == 0) {
-                    // Same file
-                    if (blackPiece < piece && rank - pieceRank < lastClosest[0]) {
-                        closest[0] = blackPiece;
-                        lastClosest[0] = rank - pieceRank;
-                    } else if (pieceRank - rank < lastClosest[2]) {
-                        closest[2] = blackPiece;
-                        lastClosest[2] = pieceRank - rank;
+        foreach (int friendlyPiece in WhiteToMove ? WhitePieces : BlackPieces) {
+            byte pieceType = Piece.GetPieceType(Square[friendlyPiece]);
+            int friendlyFile = friendlyPiece % 8;
+            int friendlyRank = (friendlyPiece - friendlyFile) / 8;
+            int[] closestOpponent = Enumerable.Repeat(-1, 8).ToArray();
+            int[] closestOppPos = Enumerable.Repeat(8, 8).ToArray();
+            foreach (int opponentPiece in WhiteToMove ? BlackPieces : WhitePieces) {
+                int opponentFile = opponentPiece % 8;
+                int opponentRank = (opponentPiece - opponentFile) / 8;
+                if (pieceType == Piece.Knight) { goto knights; }
+                if (pieceType == Piece.Bishop) { goto bishops; }
+                // Same file
+                if (opponentFile - friendlyFile == 0) {
+                    if (opponentPiece < friendlyPiece && friendlyRank - opponentRank < closestOppPos[0]) {
+                        closestOpponent[0] = opponentPiece;
+                        closestOppPos[0] = friendlyRank - opponentRank;
+                    } else if (opponentRank - friendlyRank < closestOppPos[2]) {
+                        closestOpponent[2] = opponentPiece;
+                        closestOppPos[2] = opponentRank - friendlyRank;
                     }
                 }
-                if (pieceRank - rank == 0) {
-                    // Same rank
-                    if (blackPiece > piece && pieceFile - file < lastClosest[1]) {
-                        closest[1] = blackPiece;
-                        lastClosest[1] = pieceFile - file;
-                    } else if (file - pieceFile < lastClosest[3]) {
-                        closest[3] = blackPiece;
-                        lastClosest[3] = file - pieceFile;
+                // Same rank
+                if (opponentRank - friendlyRank == 0) {
+                    if (opponentPiece > friendlyPiece && opponentFile - friendlyFile < closestOppPos[1]) {
+                        closestOpponent[1] = opponentPiece;
+                        closestOppPos[1] = opponentFile - friendlyFile;
+                    } else if (friendlyFile - opponentFile < closestOppPos[3]) {
+                        closestOpponent[3] = opponentPiece;
+                        closestOppPos[3] = friendlyFile - opponentFile;
                     }
                 }
-                if (pieceFile - file + pieceRank - rank == 0) {
-                    // Upwards diagonal
-                    if (blackPiece < piece && pieceFile - file < lastClosest[4]) {
-                        closest[4] = blackPiece;
-                        lastClosest[4] = pieceFile - file;
-                    } else if (file - pieceFile < lastClosest[6]) {
-                        closest[6] = blackPiece;
-                        lastClosest[6] = file - pieceFile;
+                if (pieceType == Piece.Rook) { continue; }
+            bishops:
+                // Upwards diagonal
+                if (opponentFile - friendlyFile + opponentRank - friendlyRank == 0) {
+                    if (opponentPiece < friendlyPiece && opponentFile - friendlyFile < closestOppPos[4]) {
+                        closestOpponent[4] = opponentPiece;
+                        closestOppPos[4] = opponentFile - friendlyFile;
+                    } else if (friendlyFile - opponentFile < closestOppPos[6]) {
+                        closestOpponent[6] = opponentPiece;
+                        closestOppPos[6] = friendlyFile - opponentFile;
                     }
                 }
-                if (pieceFile - file - pieceRank + rank == 0) {
-                    // Downwards diagonal
-                    if (blackPiece > piece && pieceFile - file < lastClosest[5]) {
-                        closest[5] = blackPiece;
-                        lastClosest[5] = pieceFile - file;
-                    } else if (file - pieceFile < lastClosest[7]) {
-                        closest[7] = blackPiece;
-                        lastClosest[7] = file - pieceFile;
+                // Downwards diagonal
+                if (opponentFile - friendlyFile - opponentRank + friendlyRank == 0) {
+                    if (opponentPiece > friendlyPiece && opponentFile - friendlyFile < closestOppPos[5]) {
+                        closestOpponent[5] = opponentPiece;
+                        closestOppPos[5] = opponentFile - friendlyFile;
+                    } else if (friendlyFile - opponentFile < closestOppPos[7]) {
+                        closestOpponent[7] = opponentPiece;
+                        closestOppPos[7] = friendlyFile - opponentFile;
                     }
                 }
+            knights:
+                if (Math.Abs())
             }
-            foreach (int idx in closest) {
-                Console.Write(idx + " ");
-            }
-            Console.WriteLine();
+
+            // Move generation:
+
+            
         }
 
         int maxMoves = 120;
