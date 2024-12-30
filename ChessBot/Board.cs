@@ -7,17 +7,23 @@ public class Board {
     // LastMove: holds the last move that was made, useful for identifying en passants and seraching for legal moves.
     // HalfMoves: I still haven't read about what this means, but I'm keeping track of it when loaded from a FEN, as it may be needed later.
     // FullMoves: The number of white-black turns taken until now.
-    public static byte[] Square = new byte[64];
-    public static bool[] CastleRights = new bool[4];
-    public static bool WhiteToMove = true;
-    public static Move? LastMove;
-    public static int HalfMoves, FullMoves; 
+    // WhitePieces, BlackPieces: keeps track of the indices of all of white's and black's pieces. Useful for legal move generation.
+    static byte[] Square = new byte[64];
+    static bool[] CastleRights = new bool[4];
+    static bool WhiteToMove = true;
+    static Move? LastMove;
+    static int HalfMoves, FullMoves;
+    static int[] WhitePieces = new int[16];
+    static int[] BlackPieces = new int[16];
     
     // Reset(string fen): resets the board to the given FEN string position.
     // Reset(): resets the board to startpos with the respective FEN string.
     public static void Reset(string fen) {
         Square = new byte[64];
         CastleRights = new bool[4];
+        WhitePieces = new int[16];
+        BlackPieces = new int[16];
+        int wpi = 0, bpi = 0;
         char c;
         int s = 0;
         int last = 0;
@@ -28,7 +34,15 @@ public class Board {
             } else if (c == '/') {
                 s += (s % 8 == 0) ? 0 : 8 - (s % 8);
             } else {
-                Square[s] = Piece.ToPiece(c);
+                byte piece = Piece.ToPiece(c);
+                Square[s] = piece;
+                if (Piece.IsColor(piece, Piece.White)) {
+                    WhitePieces[wpi] = s;
+                    wpi++;
+                } else {
+                    BlackPieces[bpi] = s;
+                    bpi++;
+                }
                 s++;
             }
             if (s > 63) {
@@ -38,9 +52,9 @@ public class Board {
         }
         last += 2;
         c = fen.ElementAt(last);
-        WhiteToMove = (c == 'w');
+        WhiteToMove = c == 'w';
         last += 2;
-        string castle = fen.Substring(last, fen.IndexOf(' ', last) - last);
+        string castle = fen[last..fen.IndexOf(' ', last)];
         if (castle.Length > 0) {
             last = fen.IndexOf(' ', last);
             for (int i = 0; i < castle.Length; i++) {
@@ -64,16 +78,16 @@ public class Board {
         last++;
         c = fen.ElementAt(last);
         if (c != '-') {
-            string en = fen.Substring(last, fen.IndexOf(' ', last) - last);
+            string en = fen[last..fen.IndexOf(' ', last)];
             LastMove = Move.FromEnPassantTargetSquare(en);
         } else {
             LastMove = null;
         }
         last = fen.IndexOf(' ', last) + 1;
-        string hm = fen.Substring(last, fen.IndexOf(' ', last) - last);
+        string hm = fen[last..fen.IndexOf(' ', last)];
         HalfMoves = int.Parse(hm);
         last = fen.IndexOf(' ', last) + 1;
-        string fm = fen.Substring(last);
+        string fm = fen[last..];
         FullMoves = int.Parse(fm);
     }
     public static void Reset() {
@@ -104,7 +118,7 @@ public class Board {
         for (int i = 0; i < 64; i++) {
             Console.Write(" " + Piece.ToChar(Square[i]) + " |");
             if ((i + 1) % 8 == 0) {
-                Console.WriteLine(" " + (9 - (int) ((i + 1) / 8)));
+                Console.WriteLine(" " + (9 - (i + 1) / 8));
                 Console.WriteLine("+---+---+---+---+---+---+---+---+");
                 if (i == 63) {
                     break;
@@ -123,6 +137,19 @@ public class Board {
         Console.WriteLine(WhiteToMove ? "White to move" : "Black to move");
         Console.WriteLine("Last move: " + ((LastMove == null) ? "-" : LastMove.ToString()));
         Console.WriteLine("Half moves: " + HalfMoves + "  Full moves: " + FullMoves);
+        Console.WriteLine("White pieces indices: ");
+        for (int i = 0; i < 16; i++) {
+            string add = WhitePieces[i] < 10 ? " " : "";
+            Console.Write("  " + WhitePieces[i] + add);
+        }
+        Console.WriteLine();
+        Console.WriteLine("Black pieces indices: ");
+        for (int i = 0; i < 16; i++) {
+            string add = BlackPieces[i] < 10 ? " " : "";
+            Console.Write("  " + BlackPieces[i] + add);
+        }
+        Console.WriteLine();
+        Console.WriteLine();
         Print();
     }
 }

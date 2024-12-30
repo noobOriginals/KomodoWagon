@@ -36,44 +36,28 @@ public class Piece {
     public static char ToChar(byte piece) {
         bool uppercase = IsColor(piece, White);
         piece = GetPieceType(piece);
-        switch (piece) {
-            case None:
-                return ' ';
-            case Pawn:
-                return (uppercase) ? 'P' : 'p';
-            case Knight:
-                return (uppercase) ? 'N' : 'n';
-            case Bishop:
-                return (uppercase) ? 'B' : 'b';
-            case Rook:
-                return (uppercase) ? 'R' : 'r';
-            case Queen:
-                return (uppercase) ? 'Q' : 'q';
-            case King:
-                return (uppercase) ? 'K' : 'k';
-            default:
-                return ' ';
-        }
+        return piece switch {
+            None => ' ',
+            Pawn => uppercase ? 'P' : 'p',
+            Knight => uppercase ? 'N' : 'n',
+            Bishop => uppercase ? 'B' : 'b',
+            Rook => uppercase ? 'R' : 'r',
+            Queen => uppercase ? 'Q' : 'q',
+            King => uppercase ? 'K' : 'k',
+            _ => ' ',
+        };
     }
     public static byte ToPiece(char value) {
         bool uppercase = Char.IsUpper(value);
-        switch (Char.ToUpper(value)) {
-            case ' ':
-                return None;
-            case 'P':
-                return (byte) (((uppercase) ? White : Black) | Pawn);
-            case 'N':
-                return (byte) (((uppercase) ? White : Black) | Knight);
-            case 'B':
-                return (byte) (((uppercase) ? White : Black) | Bishop);
-            case 'R':
-                return (byte) (((uppercase) ? White : Black) | Rook);
-            case 'Q':
-                return (byte) (((uppercase) ? White : Black) | Queen);
-            case 'K':
-                return (byte) (((uppercase) ? White : Black) | King);
-            default:
-                return None;
-        }
+        return Char.ToUpper(value) switch {
+            ' ' => None,
+            'P' => (byte) ((uppercase ? White : Black) | Pawn),
+            'N' => (byte) ((uppercase ? White : Black) | Knight),
+            'B' => (byte) ((uppercase ? White : Black) | Bishop),
+            'R' => (byte) ((uppercase ? White : Black) | Rook),
+            'Q' => (byte) ((uppercase ? White : Black) | Queen),
+            'K' => (byte) ((uppercase ? White : Black) | King),
+            _ => None,
+        };
     }
 }
