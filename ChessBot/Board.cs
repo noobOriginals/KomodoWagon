@@ -159,7 +159,9 @@ public class Board {
                     }
                 }
             knights:
-                if (Math.Abs())
+                if (Math.Abs(opponentRank - friendlyRank) - Math.Abs(opponentFile - friendlyFile) == 1) {
+                    
+                }
             }
 
             // Move generation:
